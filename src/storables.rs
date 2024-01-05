@@ -1,7 +1,4 @@
 // This file contains the Storage trait and all implementations of it. 
-
-use std::fs::File;
-
 use crate::table::Table;
 
 pub trait Storage<'a> {

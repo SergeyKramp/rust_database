@@ -1,20 +1,15 @@
-use std::fmt::Result;
-use std::fs::File;
 use crate::storables::Storage;
 use crate::table::Table;
+use std::fmt::Result;
 
 pub struct Database<'a> {
     storage: Box<dyn Storage<'a>>,
     tables: Option<Vec<Table<'a>>>,
 }
 
-
 impl<'a> Database<'a> {
     pub fn new(storage: Box<dyn Storage<'a>>, tables: Option<Vec<Table<'a>>>) -> Database<'a> {
-        Database {
-            storage,
-            tables
-        }
+        Database { storage, tables }
     }
 
     pub fn make_table(&mut self, table_name: String) {
@@ -22,16 +17,10 @@ impl<'a> Database<'a> {
         self.tables.get_or_insert(vec![]).push(table);
     }
 
-    pub fn flush(&self) -> Result<(), std::io::Error> {
+    pub fn flush(&'a mut self) -> std::io::Result<()> {
         self.storage.save(&self.tables.as_ref().unwrap())
     }
-
-
-    }
-
 }
-
-
 
 #[cfg(test)]
 mod tests {
@@ -57,7 +46,7 @@ mod tests {
         let ram_storage: Box<RAMStorage<'_>> = Box::new(RAMStorage::new());
         let mut database = Database::new(ram_storage, None);
         database.tables = Some(vec![Table::new("test".to_string())]);
-        
+
         // When: we flush the database
         database.flush();
 
