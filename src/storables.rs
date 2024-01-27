@@ -1,4 +1,5 @@
 ///! This module contains the Storage trait and all implementations of it. 
+use std::cell::RefCell;
 use crate::table::Table;
 
 ///! Represents a generic storage device.
@@ -8,7 +9,7 @@ pub trait Storage<'a> {
     /// # Arguments
     /// 
     /// * `tables` - A vector of tables to be saved.
-    fn save(&mut self, tables: &[Table<'a>]) -> Result<(), std::io::Error>;
+    fn save(&self, tables: &[Table<'a>]) -> Result<(), std::io::Error>;
     /// Load tables from the storage device.
     /// 
     /// # Returns
@@ -25,29 +26,29 @@ pub trait Storage<'a> {
 
 ///! An in memory storage container.
 pub struct RAMStorage<'a> {
-    tables: Vec<Table<'a>>,
+    tables: RefCell<Vec<Table<'a>>>,
 }
 
 impl<'a> RAMStorage<'a> {
     pub fn new() -> RAMStorage<'a> {
         RAMStorage {
-            tables: vec![],
+            tables: RefCell::new(vec![]),
         }
     }
 }
 
 impl<'a> Storage<'a> for RAMStorage<'a> {
-    fn save(&mut self, tables: &[Table<'a>]) -> Result<(), std::io::Error> {
-        self.tables = tables.to_vec();
+    fn save(&self, tables: &[Table<'a>]) -> Result<(), std::io::Error> {
+        self.tables.replace(tables.to_vec());
         Ok(())
     }
 
     fn load(&self) -> Result<Vec<Table<'a>>, std::io::Error> {
-        Ok(self.tables.clone())
+        Ok(self.tables.borrow().to_vec())
     }
 
     fn get_number_of_tables(&self) -> usize {
-        self.tables.len()
+        self.tables.borrow().len()
     }
 }
 
