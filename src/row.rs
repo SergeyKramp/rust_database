@@ -1,7 +1,8 @@
 ///! Contains the Row struct and it's methods
 use std::collections::HashMap;
 use uuid::Uuid;
-use crate::column::{Column, ColumnValue};
+use crate::column::Column;
+use crate::column_types::ColumnValue;
 
 /// Represents a row in the database it's metadata.
 #[derive(Clone)]

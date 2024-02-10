@@ -1,12 +1,13 @@
-///! Contains the Column struct and its associated types.
+///! Contains the Column struct
 use uuid::Uuid;
+use crate::column_types::{ColumnType, ColumnValue};
 
 /// The Column struct represents a column in a database table.
 #[derive(PartialEq, Eq, Hash, Clone)]
 pub struct Column {
     id: Uuid,
-    name: String,
-    column_type: ColumnType,
+    pub name: String,
+    pub column_type: ColumnType,
 }
 
 impl Column {
@@ -17,22 +18,24 @@ impl Column {
             column_type: column_type,
         }
     }
-}
 
-/// Represents the type of a column.
-#[derive(Debug, PartialEq, Eq, Hash, Clone)]
-pub enum ColumnType {
-    Integer,
-    Float,
-    String,
 }
-
-/// Represents a potential value of a column.
-#[derive(Clone)]
-pub enum ColumnValue {
-    IntValue(i32),
-    FloatValue(f32),
-    StringValue(String),
+pub fn parse_column_value(column_type: &ColumnType, value: &str) -> Result<ColumnValue, String> {
+    match column_type {
+        ColumnType::Integer => {
+            match value.parse::<i32>() {
+                Ok(value) => Ok(ColumnValue::IntValue(value)),
+                Err(_) => Err("Invalid integer value.".to_string()),
+            }
+        },
+        ColumnType::Float => {
+            match value.parse::<f32>() {
+                Ok(value) => Ok(ColumnValue::FloatValue(value)),
+                Err(_) => Err("Invalid float value.".to_string()),
+            }
+        },
+        ColumnType::String => Ok(ColumnValue::StringValue(value.to_string())),
+    }
 }
 
 #[cfg(test)]
@@ -44,4 +47,38 @@ mod tests {
         let column = Column::new(None, "test".to_string(), ColumnType::Integer);
         assert_eq!(column.column_type, ColumnType::Integer);
     }
+
+    #[test]
+    fn test_parse_column_value_integer() {
+        let value = "5";
+        let column_type = ColumnType::Integer;
+        let result = parse_column_value(&column_type, value);
+        assert_eq!(result, Ok(ColumnValue::IntValue(5)));
+    }
+
+    #[test]
+    fn test_parse_column_value_float_decimal() {
+        let value = "5.5";
+        let column_type = ColumnType::Float;
+        let result = parse_column_value(&column_type, value);
+        assert_eq!(result, Ok(ColumnValue::FloatValue(5.5)));
+    }
+
+    #[test]
+    fn test_parse_column_value_float_integer() {
+        let value = "5";
+        let column_type = ColumnType::Float;
+        let result = parse_column_value(&column_type, value);
+        assert_eq!(result, Ok(ColumnValue::FloatValue(5.0)));
+    }
+
+    #[test]
+    fn test_parse_column_value_string() {
+        let value = "test";
+        let column_type = ColumnType::String;
+        let result = parse_column_value(&column_type, value);
+        assert_eq!(result, Ok(ColumnValue::StringValue("test".to_string())));
+    }
+
+
 }

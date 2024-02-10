@@ -15,7 +15,7 @@ pub trait Storage<'a> {
     /// # Returns
     /// 
     /// A `Result` containing a vector of tables or an `std::io::Error`.
-    fn load(&self) ->  Result<Vec<Table>, std::io::Error>;
+    fn load(&self) ->  Result<Vec<Table<'a>>, std::io::Error>;
     /// Get the number of tables stored.
     /// 
     /// # Returns
@@ -60,7 +60,7 @@ mod tests {
     #[test]
     fn save_ram() {
         // Given: a RAMStorage  
-        let mut ram_storage = RAMStorage::new();
+        let ram_storage = RAMStorage::new();
         let table = Table::new("test".to_string());
         let tables = vec![table];
 
@@ -68,16 +68,16 @@ mod tests {
         let _ = ram_storage.save(&tables);
         
         // Then: the table is saved
-        assert_eq!(ram_storage.tables.len(), 1);
+        assert_eq!(ram_storage.get_number_of_tables(), 1);
     }
 
     #[test]
     fn load_ram() {
         // Given: a RAMStorage with a table
-        let mut ram_storage = RAMStorage::new();
+        let ram_storage = RAMStorage::new();
         let table = Table::new("test".to_string());
         let tables = vec![table];
-        ram_storage.tables = tables.clone();
+        let _ = ram_storage.save(&tables);
 
         // When: we call load
         let loaded_tables = ram_storage.load();
@@ -89,7 +89,7 @@ mod tests {
     #[test]
     fn test_get_number_of_tables() {
         // Given: a RAMStorage instance with some tables
-        let mut storage: RAMStorage<'_> = RAMStorage::new();
+        let storage: RAMStorage<'_> = RAMStorage::new();
         let tables = vec![Table::new("table1".to_string()), Table::new("table2".to_string())];
         storage.save(&tables).unwrap();
 
