@@ -1,81 +1,66 @@
-use std::cell::RefCell;
 use std::collections::HashMap;
 use std::vec;
 
 use uuid::Uuid;
-use crate::column::{self, Column};
+use crate::column::Column;
 use crate::command::Command;
 use crate::row::Row;
 
+/// Represents a table in a database and it's metadata.
 #[derive(Clone)]
-pub struct Table<'a> {
+pub struct Table {
     id: Uuid,
     pub name: String,
-    columns: RefCell<Vec<Column>>,
-    rows: RefCell<Vec<Row<'a>>>,
+    columns: Vec<Column>,
+    rows: Vec<Row>,
 }
 
-impl<'a> Table<'a> {
-    pub fn new(name: String) -> Table<'a> {
+impl Table {
+    pub fn new(name: String) -> Table {
         Table {
             id: Uuid::new_v4(),
             name: name,
-            columns: RefCell::new(vec![]),
-            rows: RefCell::new(vec![]),
+            columns: vec![],
+            rows: vec![],
         }
     }
 
-    pub fn execute(&self, command: Command) {
+    pub fn execute(&mut self, command: Command) {
         match command {
             Command::AddColumn(name, column_type) => {
-                let column = Column::new(None, name.to_string(), column_type);
-                self.add_column(column);
+                let column = Column::new(None, name, column_type);
+                self.columns.push(column);
+
             },
             Command::AddRow(values) => {
+                // Create a HashMap and gather the values from the vector
                 let mut column_values = HashMap::new();
-                for (column_name, value) in values {
-                    let column = self.columns.borrow().iter().find(|c| c.name == column_name);
-                    match column {
-                        Some(c) => {
-                            match column::parse_column_value(&c.column_type, value) {
-                                Ok(value) => { column_values.insert(c, value); },
-                                Err(e) => println!("{}", e),
-                            }
-                        },
-                        None => println!("Column {column_name} not found."),
-                    }
+                for (id, column_value) in values {
+                    column_values.insert(id, column_value);
                 }
-                let row = Row::new(None, column_values);
-                self.add_row(row);
+                let new_row = Row::new(None, column_values);
+                self.rows.push(new_row);
             },
         }
     }
 
-    fn get_reference_to_column(&'a self, column_name: &str) -> Option<&Column> {
-        self.columns.borrow().iter().find(|c| c.name == column_name)
-    } 
-
-    fn add_column(&self, column: Column) {
-        self.columns.borrow_mut().push(column);
-    }
-
-    fn add_row(&mut self, row: Row<'a>) {
-        self.rows.borrow_mut().push(row);
-    }
 }
 
 #[cfg(test)]
 mod tests {
-    use std::collections::HashMap;
-
     use super::*;
     use crate::column_types::{ColumnType, ColumnValue};
     #[test]
     fn add_column() {
+        // Given: a database table
         let mut table = Table::new("test".to_string());
-        let column = Column::new(None, "test".to_string(),ColumnType::Integer);
-        table.add_column(column);
-        assert_eq!(table.columns.borrow().len(), 1);
+
+        // When: we add a column to the table
+        let add_column_command = Command::AddColumn("test".to_string(), ColumnType::Integer);
+        table.execute(add_column_command);
+        
+        // Then: the table has one column
+        assert_eq!(table.columns.len(), 1);
     }
 
     #[test]
@@ -83,15 +68,16 @@ mod tests {
         // Given: a table and a column and a row
         let mut table = Table::new("test".to_string());
         let column = Column::new(None, "test".to_string(), ColumnType::Integer);
+        let mut columns = &mut table.columns;
+        columns.push(column.clone());
 
-        let mut column_values = HashMap::new();
-        column_values.insert(&column, ColumnValue::IntValue(1));
-        let row = Row::new(None, column_values);
-
-        // When: we add the column and row to the table
-        table.add_row(row);
+        // When: we row to the table
+        let id = column.id;
+        let column_value = ColumnValue::IntValue(5);
+        let command = Command::AddRow(vec![(id, column_value)]);
+        table.execute(command);
 
         // Then: the table has one row
-        assert_eq!(table.rows.borrow().len(), 1); 
+        assert_eq!(table.rows.len(), 1); 
     }
 }

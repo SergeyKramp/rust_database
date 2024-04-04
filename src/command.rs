@@ -1,11 +1,11 @@
-
-use crate::column_types::ColumnType;
+use uuid::Uuid;
+use crate::column_types::{ColumnType, ColumnValue};
 
 /// Represents a command that can be executed on a table.
 pub enum Command {
-    AddColumn(&'static str, ColumnType),
+    AddColumn(String, ColumnType),
     //RemoveColumn(String),
-    AddRow(Vec<(&'static str, &'static str)>),
+    AddRow(Vec<(Uuid, ColumnValue)>),
     //RemoveRow(usize),
     //UpdateRow(usize, Vec<ColumnValue>),
 }

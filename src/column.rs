@@ -5,7 +5,7 @@ use crate::column_types::{ColumnType, ColumnValue};
 /// The Column struct represents a column in a database table.
 #[derive(PartialEq, Eq, Hash, Clone)]
 pub struct Column {
-    id: Uuid,
+    pub id: Uuid,
     pub name: String,
     pub column_type: ColumnType,
 }
