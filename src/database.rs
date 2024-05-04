@@ -50,11 +50,18 @@ impl<T: Storage> Database<T> {
     /// 
     /// * `table_name` - The name of the table to be updated.
     /// * `command` - The command to be executed on the table.
-    pub fn update_table(&mut self, table_name: &str, command: Command) {
+    pub fn update_table(&mut self, table_name: &str, command: Command) -> Result<(), String> {
         let result = self.tables.iter_mut().find(|table| table.name == table_name);
         match result {
-            Some(table) => table.execute(command),
-            None => println!("Table {table_name} not found."),
+            Some(table) => {
+                let execute_result = table.execute(command);
+                match execute_result {
+                    Ok(_) => Ok(()),
+                    Err(e) => Err(e),
+                    
+                }
+            },
+            None => Result::Err(format!("Table {} does not exist", table_name).to_string()),
         }
     }
 }
