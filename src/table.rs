@@ -19,7 +19,7 @@ impl Table {
     pub fn new(name: String) -> Table {
         Table {
             id: Uuid::new_v4(),
-            name: name,
+            name,
             columns: vec![],
             rows: vec![],
         }
@@ -76,7 +76,7 @@ impl Table {
                         column_exists = true;
                     }
                 }
-                if column_exists == false {
+                if !column_exists {
                     Result::Err(format!("Column {} does not exist", column_name).to_string())
                 } else {
                     self.columns.retain(|column| column.name != column_name);

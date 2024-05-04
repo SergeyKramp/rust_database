@@ -11,7 +11,7 @@ fn main() {
     let mut database = Database::new(storage);
 
     database.make_table("test".to_string());
-    database.update_table(
+    let _ = database.update_table(
         "test",
         Command::AddColumn("test column".to_string(), ColumnType::String),
     );

@@ -1,38 +1,39 @@
-///! This module contains the Storage trait and all implementations of it. 
+use std::hash::RandomState;
+
+///! This module contains the Storage trait and all implementations of it.
 use crate::table::Table;
 
 /// Represents a generic storage device.
 pub trait Storage {
     /// Save the tables to the storage device.
-    /// 
+    ///
     /// # Arguments
-    /// 
+    ///
     /// * `tables` - A vector of tables to be saved.
     fn save(&mut self, tables: &[Table]) -> Result<(), std::io::Error>;
     /// Load tables from the storage device.
-    /// 
+    ///
     /// # Returns
-    /// 
+    ///
     /// A `Result` containing a vector of tables or an `std::io::Error`.
     fn load(&self) -> Result<Vec<Table>, std::io::Error>;
     /// Get the number of tables stored.
-    /// 
+    ///
     /// # Returns
-    /// 
+    ///
     /// The number of tables stored.
     fn get_number_of_tables(&self) -> usize;
 }
 
-///! An in memory storage container.
-pub struct RAMStorage{
+#[derive(Default)]
+/// An in memory storage container.
+pub struct RAMStorage {
     tables: Vec<Table>,
 }
 
 impl RAMStorage {
     pub fn new() -> RAMStorage {
-        RAMStorage {
-            tables: vec![],
-        }
+        RAMStorage { tables: vec![] }
     }
 }
 
@@ -58,14 +59,14 @@ mod tests {
 
     #[test]
     fn save_ram() {
-        // Given: a RAMStorage  
+        // Given: a RAMStorage
         let mut ram_storage = RAMStorage::new();
         let table = Table::new("test".to_string());
         let tables = vec![table];
 
         // When: we save a table
         let _ = ram_storage.save(&tables);
-        
+
         // Then: the table is saved
         assert_eq!(ram_storage.get_number_of_tables(), 1);
     }
@@ -89,7 +90,10 @@ mod tests {
     fn test_get_number_of_tables() {
         // Given: a RAMStorage instance with some tables
         let mut storage: RAMStorage = RAMStorage::new();
-        let tables = vec![Table::new("table1".to_string()), Table::new("table2".to_string())];
+        let tables = vec![
+            Table::new("table1".to_string()),
+            Table::new("table2".to_string()),
+        ];
         storage.save(&tables).unwrap();
 
         // When: we call get_number_of_tables

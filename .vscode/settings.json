@@ -2,5 +2,6 @@
   "[rust]": {
     "editor.defaultFormatter": "statiolake.vscode-rustfmt",
     "editor.formatOnSave": true //optional
-  }
+  },
+  "rust-analyzer.check.command": "clippy",
 }

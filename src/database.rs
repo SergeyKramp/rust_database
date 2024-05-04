@@ -3,8 +3,6 @@ use crate::command::Command;
 use crate::storables::Storage;
 use crate::table::Table;
 
-
-
 ///! Represents a database instance.
 pub struct Database<T: Storage> {
     storage: T,
@@ -19,9 +17,9 @@ impl<T: Storage> Database<T> {
         }
     }
     /// Creates a new table in the database.
-    /// 
+    ///
     /// # Arguments
-    /// 
+    ///
     /// * `table_name` - The name of the table to be created.
     pub fn make_table(&mut self, table_name: String) {
         let table = Table::new(table_name);
@@ -40,27 +38,29 @@ impl<T: Storage> Database<T> {
             Ok(tables) => {
                 self.tables = tables;
                 Ok(())
-            },
+            }
             Err(e) => Err(e),
         }
     }
     /// Updates a table in the database.
-    /// 
+    ///
     /// # Arguments
-    /// 
+    ///
     /// * `table_name` - The name of the table to be updated.
     /// * `command` - The command to be executed on the table.
     pub fn update_table(&mut self, table_name: &str, command: Command) -> Result<(), String> {
-        let result = self.tables.iter_mut().find(|table| table.name == table_name);
+        let result = self
+            .tables
+            .iter_mut()
+            .find(|table| table.name == table_name);
         match result {
             Some(table) => {
                 let execute_result = table.execute(command);
                 match execute_result {
                     Ok(_) => Ok(()),
                     Err(e) => Err(e),
-                    
                 }
-            },
+            }
             None => Result::Err(format!("Table {} does not exist", table_name).to_string()),
         }
     }
@@ -99,10 +99,10 @@ mod tests {
     }
 
     #[test]
-    fn  load_data() {
+    fn load_data() {
         // Given: a storage device with a table
         let mut ram_storage = RAMStorage::new();
-        ram_storage.save(&vec![Table::new("test".to_string())]).unwrap();
+        ram_storage.save(&[Table::new("test".to_string())]).unwrap();
         let mut database = Database::new(ram_storage);
 
         // When: we load the data
