@@ -25,7 +25,7 @@ pub trait Storage {
     fn get_number_of_tables(&self) -> usize;
 }
 
-#[derive(Default)]
+#[derive(Default, Debug)]
 /// An in memory storage container.
 pub struct RAMStorage {
     tables: Vec<Table>,

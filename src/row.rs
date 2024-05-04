@@ -4,7 +4,7 @@ use std::collections::HashMap;
 use uuid::Uuid;
 
 /// Represents a row in the database and it's metadata.
-#[derive(Clone)]
+#[derive(Clone, Debug)]
 pub struct Row {
     id: Uuid,
     column_values: HashMap<Uuid, ColumnValue>,

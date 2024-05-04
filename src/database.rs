@@ -3,7 +3,8 @@ use crate::command::Command;
 use crate::storables::Storage;
 use crate::table::Table;
 
-///! Represents a database instance.
+/// Represents a database instance.
+#[derive(Debug)]
 pub struct Database<T: Storage> {
     storage: T,
     tables: Vec<Table>,

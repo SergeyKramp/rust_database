@@ -3,7 +3,7 @@ use crate::column_types::{ColumnType, ColumnValue};
 use uuid::Uuid;
 
 /// The Column struct represents a column in a database table.
-#[derive(PartialEq, Eq, Hash, Clone)]
+#[derive(PartialEq, Eq, Hash, Clone, Debug)]
 pub struct Column {
     pub id: Uuid,
     pub name: String,

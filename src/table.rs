@@ -7,7 +7,7 @@ use crate::row::Row;
 use uuid::Uuid;
 
 /// Represents a table in a database and it's metadata.
-#[derive(Clone)]
+#[derive(Clone, Debug)]
 pub struct Table {
     id: Uuid,
     pub name: String,
@@ -41,11 +41,11 @@ impl Table {
             Command::AddRow(values) => {
                 // Check that all columns exist using the column name
                 for (column_name, _) in &values {
-                    let column_does_not_exist = self
+                    let column_exists = self
                         .columns
                         .iter()
                         .any(|column| column.name == *column_name);
-                    if column_does_not_exist {
+                    if !column_exists {
                         return Result::Err(
                             format!("Column {} does not exist", column_name).to_string(),
                         );
