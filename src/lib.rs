@@ -1,7 +1,7 @@
-pub mod database;
-pub mod storables;
-pub mod command;
-pub mod column_types;
-mod row;
-mod table;
 mod column;
+pub mod column_types;
+pub mod command;
+pub mod database;
+mod row;
+pub mod storables;
+mod table;
