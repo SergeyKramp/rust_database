@@ -1,7 +1,14 @@
-use nom::*;
+use crate::interface::query::Query;
+use nom::{
+    bytes::complete::tag,
+    character::complete::multispace0,
+    IResult,
+}
 
 pub fn parse_query(input: &str) -> IResult<&str, Query> {
+    // Find the first SELECT
     let (input, _) = tag("SELECT")(input)?;
+    // Skip all whitespaces until the next character
     let (input, _) = multispace0(input)?;
     let (input, column_names) = parse_column_names(input)?;
     let (input, _) = multispace0(input)?;
